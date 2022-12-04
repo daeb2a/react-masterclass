@@ -1,5 +1,5 @@
 ## React Masterclass
-Learn and dominate the React ecosystem once and for all.
+> Learn and dominate the React ecosystem once and for all.
 ------------
 ```
 Styled Components
