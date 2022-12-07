@@ -6,12 +6,24 @@ import {
   useLocation,
   useParams,
   useRouteMatch,
+  useHistory,
+  Link
 } from "react-router-dom";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
 import Chart from "./Chart";
 import Price from "./Price";
+
+
+const TitleBtn = styled.h3`
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.5;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+  }
+`;
 
 const Title = styled.h1`
   font-size: 48px;
@@ -32,7 +44,7 @@ const Container = styled.div`
 const Header = styled.header`
   height: 15vh;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 `;
 
@@ -43,6 +55,7 @@ const Overview = styled.div`
   padding: 10px 20px;
   border-radius: 10px;
 `;
+
 const OverviewItem = styled.div`
   display: flex;
   flex-direction: column;
@@ -55,10 +68,6 @@ const OverviewItem = styled.div`
     margin-bottom: 5px;
   }
 `;
-const Description = styled.p`
-  margin: 20px 0px;
-`;
-
 
 const Tabs = styled.div`
   display: grid;
@@ -73,13 +82,18 @@ const Tab = styled.span<{ isActive: boolean }>`
   font-size: 12px;
   font-weight: 400;
   background-color: rgba(0, 0, 0, 0.5);
+  padding: 7px 0px;
   border-radius: 10px;
   color: ${(props) =>
     props.isActive ? props.theme.accentColor : props.theme.textColor};
   a {
-    display: block;
     padding: 7px 0px;
+    display: block;
   }
+`;
+
+const Description = styled.p`
+  margin: 20px 0px;
 `;
 
 interface RouteParams {
@@ -98,6 +112,7 @@ interface InfoData {
   is_new: boolean;
   is_active: boolean;
   type: string;
+  logo: string;
   description: string;
   message: string;
   open_source: boolean;
@@ -146,27 +161,11 @@ interface PriceData {
 }
 
 function Coin() {
+  const history = useHistory();
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-  /* const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>(); */
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
-  /* useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-    
-  }, [coinId]); */
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["info", coinId],
     () => fetchCoinInfo(coinId)
@@ -179,6 +178,7 @@ function Coin() {
     }
   );
   const loading = infoLoading || tickersLoading;
+
   return (
     <Container>
       <Helmet>
@@ -187,9 +187,11 @@ function Coin() {
         </title>
       </Helmet>
       <Header>
+        <TitleBtn onClick={() => {history.push('/');}}>Home</TitleBtn>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
+        <TitleBtn onClick={() => {history.goBack();}}>Back</TitleBtn>
       </Header>
       {loading ? (
         <Loader>Loading...</Loader>
@@ -202,17 +204,17 @@ function Coin() {
             </OverviewItem>
             <OverviewItem>
               <span>Symbol:</span>
-              <span>${infoData?.symbol}</span>
+              <span>{infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
               <span>Price:</span>
-              <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(2)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
           <Overview>
             <OverviewItem>
-              <span>Total Suply:</span>
+              <span>Total Supply:</span>
               <span>{tickersData?.total_supply}</span>
             </OverviewItem>
             <OverviewItem>
@@ -230,7 +232,7 @@ function Coin() {
           </Tabs>
           <Switch>
             <Route path={`/:coinId/price`}>
-              <Price />
+              <Price coinId={coinId} />
             </Route>
             <Route path={`/:coinId/chart`}>
               <Chart coinId={coinId} />
@@ -241,4 +243,5 @@ function Coin() {
     </Container>
   );
 }
+
 export default Coin;
