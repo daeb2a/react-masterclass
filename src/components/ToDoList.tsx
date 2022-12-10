@@ -5,6 +5,7 @@ import ToDo from "./ToDo";
 
 function ToDoList() {
   const toDos = useRecoilValue(toDoState);
+  console.log(toDos);
   return (
     <div>
       <h1>To Dos</h1>
@@ -12,7 +13,7 @@ function ToDoList() {
       <CreateToDo />
       <ul>
         {toDos.map((toDo) => (
-          /* <ToDo key={toDo.id} category={toDo.category} id={toDo.id} /> */
+          /* <ToDo key={toDo.id} category={toDo.category} id={toDo.id} text={toDo.text} /> */
           <ToDo key={toDo.id} {...toDo} />
         ))}
       </ul>
