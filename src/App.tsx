@@ -1,5 +1,5 @@
 import { createGlobalStyle } from "styled-components";
-import ToDoList from "./components/ToDoList";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -66,10 +66,30 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  const onDragEnd = () => {};
   return (
     <>
       <GlobalStyle />
-      <ToDoList />
+        <>
+          <DragDropContext onDragEnd={onDragEnd}>
+          <div>
+            <Droppable droppableId="one">
+              {(magic) => (
+                <ul ref={magic.innerRef} {...magic.droppableProps}>
+                  <Draggable draggableId="first" index={0}>
+                    {(magic) => (
+                      <li ref={magic.innerRef} {...magic.draggableProps}>
+                        <span {...magic.dragHandleProps}>🔥</span>
+                        One
+                      </li>
+                    )}
+                  </Draggable>
+                </ul>
+              )}
+            </Droppable>
+          </div>
+        </DragDropContext>
+      </>
     </>
   );
 }
