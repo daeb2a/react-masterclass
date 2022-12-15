@@ -10,4 +10,5 @@ Apex Charts
 React Spring
 Typescript
 Firebase
+Framer Motion
 ```
